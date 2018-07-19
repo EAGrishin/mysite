@@ -7,6 +7,8 @@ use app\models\User;
 use app\models\Payment;
 use yii\web\Controller;
 use app\models\UserSearch;
+use yii\log\Logger;
+use yii\web\ServerErrorHttpException;
 
 class SiteController extends Controller
 {
@@ -32,12 +34,24 @@ class SiteController extends Controller
     {
         $model = new Payment();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $user = User::findOne($model->payer_user_id);
-            $user->balance -= $model->cost;
-            if ($model->save() && $user->save()) {
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $user = User::findOne($model->payer_user_id);
+                $user->balance -= $model->cost;
+                if ($model->save()) {
+                    $user->last_payment_id = $model->id;
+                    $user->save();
+                }
+                $transaction->commit();
                 Yii::$app->session->setFlash('success', '✔ Данная сумма списалась с баланса, перевод выполнится в указанное время');
                 return $this->refresh();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR);
+                throw new ServerErrorHttpException();
             }
+
         }
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

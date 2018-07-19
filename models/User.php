@@ -11,9 +11,11 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $username
  * @property int $balance
+ * @property int $last_payment_id
  * @property string $created_at
  *
  * @property Payment[] $payments
+ * @property Payment $lastPayment
  */
 class User extends ActiveRecord
 {
@@ -33,7 +35,7 @@ class User extends ActiveRecord
         return [
             [['username', 'created_at'], 'required'],
             [['balance'], 'integer'],
-            [['created_at'], 'safe'],
+            [['created_at', 'last_payment_id'], 'safe'],
             [['username'], 'string', 'max' => 255],
         ];
     }
@@ -57,5 +59,10 @@ class User extends ActiveRecord
     public function getPayments()
     {
         return $this->hasMany(Payment::className(), ['payer_user_id' => 'id'])->orderBy(['payment.id' => SORT_DESC]);
+    }
+
+    public function getLastPayment()
+    {
+        return $this->hasOne(Payment::className(), ['id' => 'last_payment_id']);
     }
 }

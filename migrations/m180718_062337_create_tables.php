@@ -14,6 +14,7 @@ class m180718_062337_create_tables extends Migration
             'id' => Schema::TYPE_PK,
             'username' => Schema::TYPE_STRING . ' NOT NULL',
             'balance' => Schema::TYPE_INTEGER . ' NOT NULL DEFAULT 0',
+            'last_payment_id' => Schema::TYPE_INTEGER . ' NULL DEFAULT NULL',
             'created_at' => Schema::TYPE_DATETIME . ' NOT NULL',
         ]);
 
@@ -42,7 +43,7 @@ class m180718_062337_create_tables extends Migration
 
     public function down()
     {
-        $this->dropTable('{{%user}}');
         $this->dropTable('{{%payment}}');
+        $this->dropTable('{{%user}}');
     }
 }

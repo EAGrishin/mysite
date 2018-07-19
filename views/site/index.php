@@ -54,26 +54,22 @@ $this->title = 'My Yii Application';
                             'value' => function (User $data) {
                                 /** @var User $user */
                                 $out = '';
-                                foreach ($data->payments as $payment) {
-                                    $out .= $payment->cost . " руб. <br>";
-                                    if ($payment->status == Payment::STATUS_NEW) {
+                                if ($data->lastPayment) {
+                                    $out .= $data->lastPayment->cost . " руб. <br>";
+                                    if ($data->lastPayment->status == Payment::STATUS_NEW) {
                                         $status = "Ожидает перевода";
                                     } else {
-                                        $status = "<span style='color: #3e8f3e'>Превод выполнен</span>";
+                                        $status = Html::tag('span', 'Превод выполнен', ['style' => 'color: #3e8f3e']);
                                     }
-                                    $out .= $status . "<br> UserId (" . $payment->payee_user_id . ") <br>"
-                                        . $payment->date_payment;
-                                    break;
+                                    $out .= $status . "<br> UserId (" . $data->lastPayment->payee_user_id . ") <br>"
+                                        . $data->lastPayment->date_payment;
                                 }
                                 return $out;
-
-
                             }
                         ],
                     ],
                 ]); ?>
             </div>
         </div>
-
     </div>
 </div>
