@@ -1,51 +1,77 @@
 <?php
 
+use yii\grid\GridView;
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+use app\models\User;
+use app\models\Payment;
+
 /* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
 
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
-
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
     <div class="body-content">
-
         <div class="row">
             <div class="col-lg-4">
-                <h2>Heading</h2>
+                <div class="well">
+                    <?php $form = ActiveForm::begin(['id' => 'payment-form']); ?>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+                    <?= $form->field($model, 'payer_user_id') ?>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+                    <?= $form->field($model, 'payee_user_id') ?>
+
+                    <?= $form->field($model, 'cost') ?>
+
+                    <?= $form->field($model, 'date_payment')->widget(\yii\jui\DatePicker::className(), [
+                        'dateFormat' => 'yyyy-MM-dd 00:00:00',
+                        'options' => ['class' => 'form-control'],
+                    ])->label('Дата и время перевода'); ?>
+
+
+                    <div class="form-group">
+                        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+                    </div>
+
+                    <?php ActiveForm::end(); ?>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+            <div class="col-lg-7">
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    'filterModel' => $searchModel,
+                    'filterSelector' => 'select[name="per-page"]',
+                    'tableOptions' => ['class' => 'table table-bordered table-stripped', 'style' => 'margin-top:5px;'],
+                    'columns' => [
+                        'id',
+                        'username',
+                        'balance',
+                        'created_at',
+                        [
+                            'label' => 'Последний перевод',
+                            'format' => 'raw',
+                            'value' => function (User $data) {
+                                /** @var User $user */
+                                $out = '';
+                                foreach ($data->payments as $payment) {
+                                    $out .= $payment->cost . " руб. <br>";
+                                    if ($payment->status == Payment::STATUS_NEW) {
+                                        $status = "Ожидает перевода";
+                                    } else {
+                                        $status = "<span style='color: #3e8f3e'>Превод выполнен</span>";
+                                    }
+                                    $out .= $status . "<br> UserId (" . $payment->payee_user_id . ") <br>"
+                                        . $payment->date_payment;
+                                    break;
+                                }
+                                return $out;
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+                            }
+                        ],
+                    ],
+                ]); ?>
             </div>
         </div>
 
