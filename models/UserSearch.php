@@ -47,7 +47,7 @@ class UserSearch extends User
     public function search($params)
     {
         /** @var ActiveQuery $query */
-        $query = User::find()->joinWith('payments');
+        $query = User::find()->joinWith('payments')->groupBy(['payment.id', 'user.id']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
