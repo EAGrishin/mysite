@@ -4,6 +4,8 @@ namespace app\models;
 
 
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "user".
@@ -27,13 +29,25 @@ class User extends ActiveRecord
         return '{{%user}}';
     }
 
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
+                'updatedAtAttribute' => false,
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['username', 'created_at'], 'required'],
+            [['username'], 'required'],
             [['balance'], 'integer'],
             [['created_at', 'last_payment_id'], 'safe'],
             [['username'], 'string', 'max' => 255],

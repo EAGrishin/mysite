@@ -3,11 +3,15 @@
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use app\models\User;
 use app\models\Payment;
 
 /* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
+/* @var $form ActiveForm */
+/* @var $dataProvider ActiveDataProvider */
+/* @var $searchModel ActiveQuery */
 
 $this->title = 'My Yii Application';
 ?>
@@ -38,6 +42,9 @@ $this->title = 'My Yii Application';
                 </div>
             </div>
             <div class="col-lg-7">
+                <p>
+                    <?= Html::a('Добавить пользователя', ['create'], ['class' => 'btn btn-success']) ?>
+                </p>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
