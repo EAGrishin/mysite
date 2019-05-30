@@ -47,8 +47,9 @@ class User extends ActiveRecord
     public function rules()
     {
         return [
-            [['username'], 'required'],
-            [['balance'], 'integer'],
+            [['username'], 'required', 'message' => 'Необходимо указать Имя'],
+            [['balance'], 'required', 'message' => 'Необходимо указать Баланс'],
+            [['balance'], 'integer', 'message' => 'Неверный формат баланса'],
             [['created_at', 'last_payment_id'], 'safe'],
             [['username'], 'string', 'max' => 255],
         ];
